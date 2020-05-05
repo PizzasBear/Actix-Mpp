@@ -4,13 +4,14 @@
 // #[macro_use]
 // extern crate actix_web;
 
+mod config;
+
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use std::sync::Mutex;
-use std::fs;
 use tokio_postgres::{NoTls, Client};
 
 use handlebars::Handlebars;
-
+use config::{Config};
 use serde_json::json;
 
 struct AppState<'a> {
@@ -41,48 +42,11 @@ async fn index(req: HttpRequest, data: web::Data<AppState<'_>>) -> impl Responde
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     // -- config --
-    let address: String;
-    let is_unix_address: bool;
-    let pg_config: String;
-    match fs::read_to_string("./Conf.json") {
-        Ok(cfg_json) => {
-            let config: serde_json::Value = serde_json::from_str(&cfg_json).unwrap();
-
-            let unix_specified: bool;
-            is_unix_address = match config["unix"].as_bool() {
-                Some(b) => {
-                    unix_specified = true;
-                    b
-                },
-                None => {
-                    unix_specified = false;
-                    false
-                },
-            };
-            
-            address = match config["address"].as_str() {
-                Some(s) => s.to_string(),
-                None => {
-                    if unix_specified {
-                        panic!("If \"unix\" is specified then you have to specify.")
-                    }
-                    else {
-                        "127.0.0.1:8088".to_string()
-                    }
-                },
-            };
-
-            match config["pgConfig"].as_str() {
-                Some(s) => pg_config = s.to_string(),
-                None => panic!("No \"pgConfig\" field found in the file \"Config.json\"."),
-            }
-        },
-        Err(_) => panic!("Failed to read a file."),
-    }
+    let cfg = Config::read(&"./Conf.json");
 
     // -- postgres --
     let (client, connection) =
-        match tokio_postgres::connect(&pg_config, NoTls).await {
+        match tokio_postgres::connect(&cfg.pg_config, NoTls).await {
             Ok(a) => a,
             Err(e) => panic!(format!("Couldn't connect to postgres {}", e)),
         };
@@ -111,13 +75,13 @@ async fn main() -> std::io::Result<()> {
             // .route("/", web::get().to(index))
     });
     
-    if is_unix_address {
-        server.bind_uds(address)?
+    if cfg.is_unix_address {
+        server.bind_uds(cfg.address)?
         .run()
         .await
     }
     else {
-        server.bind(address)?
+        server.bind(cfg.address)?
         .run()
         .await
     }
