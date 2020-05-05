@@ -42,7 +42,7 @@ async fn index(req: HttpRequest, data: web::Data<AppState<'_>>) -> impl Responde
 async fn main() -> std::io::Result<()> {
     // -- postgres --
     let (client, connection) =
-        match tokio_postgres::connect("host=localhost user=actixmpp dbname=actixmppdb password=catData-Base123 port=5432", NoTls).await {
+        match tokio_postgres::connect("", NoTls).await {
             Ok(a) => a,
             Err(e) => panic!(format!("Couldn't connect to postgres {}", e)),
         };
