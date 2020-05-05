@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "strict": true,
+        "outDir": "static/js",
+        "importHelpers": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "baseUrl": ".",
+        "types": [
+        ],
+        "paths": {
+            "@/*": [
+                "static/ts/*"
+            ]
+        },
+        "lib": [
+            "esnext",
+            "dom",
+            "dom.iterable",
+            "scripthost"
+        ]
+    },
+    "include": [
+        "static/ts/**/*.ts",
+    ],
+    "exclude": []
+}
