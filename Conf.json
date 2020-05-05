@@ -1,3 +1,4 @@
 {
-    "address": "localhost:8088"
+    "address": "localhost:8088",
+    "postgres": "host=localhost user=actixmpp dbname=actixmppdb password=catData-Base123 port=5432"
 }
