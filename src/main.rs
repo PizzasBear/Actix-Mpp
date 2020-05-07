@@ -72,7 +72,9 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(state_ref.clone())
             .service(web::resource("/").to(index))
-            // .route("/", web::get().to(index))
+            .service(web::resource("//").to(|| {
+                HttpResponse::PermanentRedirect().header("Location", "/").finish()
+            }))
     });
     
     if cfg.is_unix_address {
