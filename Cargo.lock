@@ -266,8 +266,8 @@ dependencies = [
  "actix-rt",
  "actix-web",
  "handlebars",
+ "ron",
  "serde",
- "serde_json",
  "tokio",
  "tokio-postgres",
 ]
@@ -353,6 +353,15 @@ checksum = "18fbebbe1c9d1f383a9cc7e8ccdb471b91c8d024ee9c2ca5b5346121fe8b4399"
 dependencies = [
  "cc",
  "libc",
+]
+
+[[package]]
+name = "base64"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b25d992356d2eb0ed82172f5248873db5560c4721f564b13cb5193bda5e668e"
+dependencies = [
+ "byteorder",
 ]
 
 [[package]]
@@ -1242,8 +1251,6 @@ dependencies = [
  "bytes",
  "fallible-iterator",
  "postgres-protocol",
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -1361,6 +1368,17 @@ checksum = "11834e137f3b14e309437a8276714eed3a80d1ef894869e510f2c0c0b98b9f4a"
 dependencies = [
  "hostname",
  "quick-error",
+]
+
+[[package]]
+name = "ron"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2ece421e0c4129b90e4a35b6f625e472e96c552136f5093a2f4fa2bbb75a62d5"
+dependencies = [
+ "base64 0.10.1",
+ "bitflags",
+ "serde",
 ]
 
 [[package]]

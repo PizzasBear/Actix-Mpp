@@ -20,7 +20,7 @@ cp -r static "$output_path/static"
 
 sudo systemctl restart actixmpp
 
-echo "Remember to reconfigure $output_path/Conf.json."
+printf $"Remember to reconfigure \033[0;33m\`$output_path/Conf.ron\`\033[0m.\n"
 
 sleep 1.5s
 systemctl status actixmpp
