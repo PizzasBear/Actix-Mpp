@@ -35,7 +35,10 @@ async fn index(req: HttpRequest, data: web::Data<AppState<'_>>) -> io::Result<im
 
     let hb_data = match ron!(r#"(count: {}, address: "{}")"#, counter, info.host()) {
         Ok(o) => o,
-        Err(e) => { println!("ron Error"); return Err(io::Error::new(io::ErrorKind::InvalidData, e)) },
+        Err(e) => {
+            println!("ron Error");
+            return Err(io::Error::new(io::ErrorKind::InvalidData, e));
+        }
     };
 
     counter += 1;
@@ -59,7 +62,7 @@ async fn main() -> std::io::Result<()> {
         Err(e) => panic!(format!("Couldn't connect to postgres {}", e)),
     };
 
-    tokio::spawn(async move {
+    actix_rt::spawn(async move {
         if let Err(e) = connection.await {
             eprintln!("connection error: {}", e);
         }

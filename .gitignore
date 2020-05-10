@@ -1,4 +1,5 @@
 /target
 /static/js
 /Conf.ron
+/Cargo.lock
 /release.sh
