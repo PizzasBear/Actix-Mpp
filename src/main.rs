@@ -7,8 +7,9 @@
 mod config;
 
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
-use std::sync::Mutex;
-use tokio_postgres::{Client, NoTls};
+// use std::sync::Mutex;
+use pg::{Client, NoTls};
+use tokio_postgres as pg;
 
 use config::Config;
 use handlebars::Handlebars;
@@ -16,50 +17,59 @@ use handlebars::Handlebars;
 
 use std::io;
 
-struct AppState<'a> {
-    pub hb: Handlebars<'a>,
-    pub pg_client: Mutex<Client>,
-}
-
 macro_rules! ron {
     ($($arg:tt)*) => {{
         ron::de::from_str::<ron::Value>(&format!($($arg)*)[..])
     }}
 }
 
+macro_rules! other_err {
+    ($e:expr) => {
+        Err(io::Error::new(io::ErrorKind::Other, $e))
+    };
+}
+
+struct AppState<'a> {
+    pub hb: Handlebars<'a>,
+    pub pg_client: Client,
+}
+
 async fn index(req: HttpRequest, data: web::Data<AppState<'_>>) -> io::Result<impl Responder> {
-    let client = data.pg_client.lock().unwrap();
     let info = req.connection_info();
 
-    let mut counter: i32 = client.query("SELECT idx FROM data", &[]).await.unwrap()[0].get(0);
+    let mut counter: i32 = match data.pg_client.query("SELECT idx FROM data", &[]).await {
+        Ok(o) => o,
+        Err(e) => return other_err!(e),
+    }[0]
+    .get(0);
 
     let hb_data = match ron!(r#"(count: {}, address: "{}")"#, counter, info.host()) {
         Ok(o) => o,
-        Err(e) => {
-            println!("ron Error");
-            return Err(io::Error::new(io::ErrorKind::InvalidData, e));
-        }
+        Err(e) => return other_err!(e),
     };
 
     counter += 1;
 
-    client
+    if let Err(e) = data
+        .pg_client
         .execute("UPDATE data SET idx = $1", &[&counter])
         .await
-        .unwrap();
+    {
+        return other_err!(e);
+    }
 
     Ok(HttpResponse::Ok().body(data.hb.render("index", &hb_data).unwrap()))
 }
 
 #[actix_rt::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> io::Result<()> {
     // -- config --
     let cfg = Config::read("./Conf.ron")?;
 
     // -- postgres --
-    let (client, connection) = match tokio_postgres::connect(&cfg.pg_config, NoTls).await {
+    let (client, connection) = match pg::connect(&cfg.pg_config, NoTls).await {
         Ok(a) => a,
-        Err(e) => panic!(format!("Couldn't connect to postgres {}", e)),
+        Err(e) => return other_err!(e),
     };
 
     actix_rt::spawn(async move {
@@ -71,12 +81,12 @@ async fn main() -> std::io::Result<()> {
     // -- state --
     let mut state = AppState {
         hb: Handlebars::new(),
-        pg_client: Mutex::new(client),
+        pg_client: client,
     };
-    state
-        .hb
-        .register_templates_directory(".hbs", "./templates")
-        .unwrap();
+
+    if let Err(e) = state.hb.register_templates_directory(".hbs", "./templates") {
+        return other_err!(e);
+    }
 
     // -- http server --
     let state_ref = web::Data::new(state);

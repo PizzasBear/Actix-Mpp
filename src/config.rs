@@ -8,15 +8,6 @@ pub struct Config {
     pub pg_config: String,
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            address: "localhost:8080".into(),
-            pg_config: "".into(),
-        }
-    }
-}
-
 impl Config {
     pub fn read(path: &str) -> std::io::Result<Self> {
         let file = File::open(path)?;
