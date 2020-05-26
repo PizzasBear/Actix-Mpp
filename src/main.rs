@@ -94,11 +94,6 @@ async fn main() -> io::Result<()> {
         App::new()
             .app_data(state_ref.clone())
             .service(web::resource("/").to(index))
-            .service(web::resource("//").to(|| {
-                HttpResponse::PermanentRedirect()
-                    .header("Location", "/")
-                    .finish()
-            }))
     });
 
     server.bind(cfg.address)?.run().await
