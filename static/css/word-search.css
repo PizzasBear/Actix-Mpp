@@ -1,0 +1,46 @@
+.word-search {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    width: max-content;
+}
+
+.word-search>div {
+    display: grid;
+    grid-gap: 3px;
+    /* grid-template-columns: repeat(3, 20px); */
+    width: min-content;
+    background-color: #e8e8e8;
+    touch-action: none;
+}
+
+.word-search>div * {
+    text-align: center;
+}
+.word-search>div *[highlight="false"] {
+    color: #201;
+}
+.word-search>div *[finished] {
+    color: #e88b39;
+    font-weight: bold;
+}
+.word-search>div *[highlight="true"] {
+    color: #da6;
+    font-weight: bold;
+}
+
+.word-search>ul {
+    padding-left: 20px;
+}
+
+.word-search>ul>li[finished] {
+    text-decoration: line-through;
+}
+
+.word-search>* {
+    margin-top: 10px;
+}
+
+.word-search>:last-child {
+    margin-top: 0px;
+}
