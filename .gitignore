@@ -3,3 +3,5 @@
 /Conf.ron
 /Cargo.lock
 /release.sh
+/debug.sh
+/.vscode

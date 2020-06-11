@@ -1,9 +1,181 @@
 {{#> base address=address}}
-    {{#*inline "body-content"}}
-        <p><b>Hello {{count}}</b></p>
-    {{/inline}}
+{{#*inline "styles"}}
+<link rel="stylesheet" href="static/css/word-search.css" type='text/css'>
+{{/inline}}
 
-    {{#*inline "scripts"}}
-    
-    {{/inline}}
+{{#*inline "body-content"}}
+<div style="margin: 10px; text-align: center;">
+    <img crossorigin="anonymous" src="https://upload.wikimedia.org/wikipedia/en/d/d8/Tianasquare.jpg" class="jpg"
+        alt="Tianasquare.jpg">
+    <p style="width: 700px; margin-left: calc(50% - 340px)">
+        It happened at 1989 Bei-jing Tiananmen Square. The tanks tried to drive to the Tiananmen
+        square a day after the protest there, but tank man stopped them with the power of standing in their way. He was
+        able
+        to stop their advance by a few minutes before he disappeared into the crowd.
+    </p>
+    <ul id="question-list">
+        <li id="q1" number>
+            <h2>Q1) How old was tank man at the time of the picture?</h2>
+            Write a possible age for tank man: <input id="q1-n" type="number" min="0" max="120" value="10"
+                range="[18, 24]">
+        </li>
+        <li id="q2" radio hidden>
+            <h2>Q2) Why were there protests?</h2>
+            <p>
+                <input type="radio" id="q2-o1" name="q2" value="1">
+                <label for="q2-o1">There were protests because a democratic supporter of the communist government died,
+                    also
+                    known as Yu Yaobangs.</label>
+            </p>
+            <p>
+                <input type="radio" id="q2-o2" name="q2" value="2">
+                <label for="q2-o2">Communism isn't good and the people realised it.</label>
+            </p>
+            <p>
+                <input type="radio" id="q2-o3" name="q2" value="3">
+                <label for="q2-o3">They complained about bad conditions.</label>
+            </p>
+        </li>
+        <li id="q3" radio hidden>
+            <h2>Q3) What happened to tank man?</h2>
+            <p>
+                <input type="radio" id="q3-o1" name="q3" value="1">
+                <label for="q3-o1">He escaped the country or was charged and put in prison.</label>
+            </p>
+            <p>
+                <input type="radio" id="q3-o2" name="q3" value="2">
+                <label for="q3-o2">He became a politician.</label>
+            </p>
+        </li>
+        <li id="q4" radio hidden>
+            <h2>Q4) What happened to the protestors in Tiananmen square?</h2>
+            <p>
+                <input type="radio" id="q4-o1" name="q4" value="1">
+                <label for="q4-o1">They were either massacred or put in prison.</label>
+            </p>
+            <p>
+                <input type="radio" id="q4-o2" name="q4" value="2">
+                <label for="q4-o2">They became national heros.</label>
+            </p>
+            <p>
+                <input type="radio" id="q4-o3" name="q4" value="3">
+                <label for="q4-o3">They ran away.</label>
+            </p>
+        </li>
+        <li id="q5" radio hidden>
+            <h2>Q5) Why did the Chinese government use deadly force?</h2>
+            <p>
+                <input type="radio" id="q5-o1" name="q5" value="1">
+                <label for="q5-o1">Because communism!</label>
+            </p>
+            <p>
+                <input type="radio" id="q5-o2" name="q5" value="2">
+                <label for="q5-o2">Because it was necessary!</label>
+            </p>
+            <p>
+                <input type="radio" id="q5-o3" name="q5" value="3">
+                <label for="q5-o3">Because violance is always the answer!</label>
+            </p>
+        </li>
+        <li id="q6" radio hidden>
+            <h2>Q6) Who was the leader of china at that time?</h2>
+            <p>
+                <input type="radio" id="q6-o1" name="q6" value="1">
+                <label for="q6-o1">'Li Peng'.</label>
+            </p>
+            <p>
+                <input type="radio" id="q6-o2" name="q6" value="2">
+                <label for="q6-o2">'Li Hong'</label>
+            </p>
+            <p>
+                <input type="radio" id="q6-o3" name="q6" value="3">
+                <label for="q6-o3">'Ki Sheng'</label>
+            </p>
+        </li>
+        <li id="q7" radio hidden>
+            <h2>Q7) Who was organizing the riots?</h2>
+            <p>
+                <input type="radio" id="q7-o1" name="q7" value="1">
+                <label for="q7-o1">Students.</label>
+            </p>
+            <p>
+                <input type="radio" id="q7-o2" name="q7" value="2">
+                <label for="q7-o2">The workers.</label>
+            </p>
+            <p>
+                <input type="radio" id="q7-o3" name="q7" value="3">
+                <label for="q7-o3">The rich people.</label>
+            </p>
+        </li>
+        <li id="q8" radio hidden>
+            <h2>Q8) What happened to those who participated in the riots?</h2>
+            <p>
+                <input type="radio" id="q8-o1" name="q8" value="1">
+                <label for="q8-o1">They hit worldwide news and it helped the hong Kong protesters' moral.</label>
+            </p>
+            <p>
+                <input type="radio" id="q8-o2" name="q8" value="2">
+                <label for="q8-o2">They died.</label>
+            </p>
+            <p>
+                <input type="radio" id="q8-o3" name="q8" value="3">
+                <label for="q8-o3">They became local heros and statues were built in china to remember how great they
+                    were.</label>
+            </p>
+        </li>
+        <li id="q9" radio hidden>
+            <h2>Q9) Were the riots international information?</h2>
+            <p>
+                <input type="radio" id="q9-o1" name="q9" value="1">
+                <label for="q9-o1">Yes, america didn't support the massacre.</label>
+            </p>
+            <p>
+                <input type="radio" id="q9-o2" name="q9" value="2">
+                <label for="q9-o2">Yes, america didn't care.</label>
+            </p>
+            <p>
+                <input type="radio" id="q9-o3" name="q9" value="3">
+                <label for="q9-o3">No, until recently.</label>
+            </p>
+        </li>
+        <li id="q10" radio hidden>
+            <h2>Q10) Why didn't the protesters use force against the government?</h2>
+            <p>
+                <input type="radio" id="q10-o1" name="q10" value="1">
+                <label for="q10-o1">They wanted it to be a peaceful protest, to show their respect to the
+                    Democrats.</label>
+            </p>
+            <p>
+                <input type="radio" id="q10-o2" name="q10" value="2">
+                <label for="q10-o2">They were afraid of the government.</label>
+            </p>
+            <p>
+                <input type="radio" id="q10-o3" name="q10" value="3">
+                <label for="q10-o3">They couldn't use force.</label>
+            </p>
+        </li>
+        <li word-search hidden>
+            <h2>Q11) Word Search!</h2>
+            <div class="word-search" shape="[12, 12]">
+                <ul>
+                    <li>Communism</li>
+                    <li>China</li>
+                    <li>Rebel</li>
+                    <li>Tank</li>
+                </ul>
+                <div></div>
+            </div>
+        </li>
+        <li hidden>
+            <p>Yey you finished!!</p>
+        </li>
+    </ul>
+    <br><button style="margin-left: 10px;" onclick="next()">Next</button>
+</div>
+{{/inline}}
+
+{{#*inline "scripts"}}
+<script src="static/js/word-search.js"></script>
+<script src="static/js/question.js"></script>
+{{/inline}}
 {{/base}}

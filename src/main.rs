@@ -6,7 +6,7 @@
 
 mod config;
 
-use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
 // use std::sync::Mutex;
 use pg::{Client, NoTls};
 use tokio_postgres as pg;
@@ -15,7 +15,25 @@ use config::Config;
 use handlebars::Handlebars;
 // use serde_json::json;
 
-use std::io;
+use std::error::Error;
+
+#[derive(Debug)]
+struct GeneralError(Box<dyn Error>);
+
+impl<T: Error + 'static> From<T> for GeneralError {
+    fn from(err: T) -> Self {
+        let boxed_err = Box::new(err) as Box<dyn Error>;
+        Self(boxed_err)
+    }
+}
+
+impl std::fmt::Display for GeneralError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "GeneralError( {} )", self.0)
+    }
+}
+
+impl actix_web::ResponseError for GeneralError {}
 
 macro_rules! ron {
     ($($arg:tt)*) => {{
@@ -23,54 +41,37 @@ macro_rules! ron {
     }}
 }
 
-macro_rules! other_err {
-    ($e:expr) => {
-        Err(io::Error::new(io::ErrorKind::Other, $e))
-    };
-}
-
 struct AppState<'a> {
     pub hb: Handlebars<'a>,
     pub pg_client: Client,
 }
 
-async fn index(req: HttpRequest, data: web::Data<AppState<'_>>) -> io::Result<impl Responder> {
+async fn index(
+    req: HttpRequest,
+    data: web::Data<AppState<'_>>,
+) -> Result<HttpResponse, GeneralError> {
     let info = req.connection_info();
 
-    let mut counter: i32 = match data.pg_client.query("SELECT idx FROM data", &[]).await {
-        Ok(o) => o,
-        Err(e) => return other_err!(e),
-    }[0]
-    .get(0);
+    let mut counter: i32 = data.pg_client.query("SELECT idx FROM data", &[]).await?[0].get(0);
 
-    let hb_data = match ron!(r#"(count: {}, address: "{}")"#, counter, info.host()) {
-        Ok(o) => o,
-        Err(e) => return other_err!(e),
-    };
+    let hb_data = ron!(r#"(count: {}, address: "{}")"#, counter, info.host())?;
 
     counter += 1;
 
-    if let Err(e) = data
-        .pg_client
+    data.pg_client
         .execute("UPDATE data SET idx = $1", &[&counter])
-        .await
-    {
-        return other_err!(e);
-    }
+        .await?;
 
-    Ok(HttpResponse::Ok().body(data.hb.render("index", &hb_data).unwrap()))
+    Ok(HttpResponse::Ok().body(data.hb.render("index", &hb_data)?))
 }
 
 #[actix_rt::main]
-async fn main() -> io::Result<()> {
+async fn main() -> Result<(), Box<dyn Error>> {
     // -- config --
     let cfg = Config::read("./Conf.ron")?;
 
     // -- postgres --
-    let (client, connection) = match pg::connect(&cfg.pg_config, NoTls).await {
-        Ok(a) => a,
-        Err(e) => return other_err!(e),
-    };
+    let (client, connection) = pg::connect(&cfg.pg_config, NoTls).await?;
 
     actix_rt::spawn(async move {
         if let Err(e) = connection.await {
@@ -84,9 +85,9 @@ async fn main() -> io::Result<()> {
         pg_client: client,
     };
 
-    if let Err(e) = state.hb.register_templates_directory(".hbs", "./templates") {
-        return other_err!(e);
-    }
+    state
+        .hb
+        .register_templates_directory(".hbs", "./templates")?;
 
     // -- http server --
     let state_ref = web::Data::new(state);
@@ -96,5 +97,7 @@ async fn main() -> io::Result<()> {
             .service(web::resource("/").to(index))
     });
 
-    server.bind(cfg.address)?.run().await
+    server.bind(cfg.address)?.run().await?;
+
+    Ok(())
 }
